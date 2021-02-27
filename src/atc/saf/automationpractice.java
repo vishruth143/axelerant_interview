@@ -17,17 +17,99 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import com.assertthat.selenium_shutterbug.core.Shutterbug;
+
 import org.apache.commons.io.FileUtils;
 
 
 public class automationpractice {
 	
-	public static WebDriver driver = null;
+	WebDriver driver = null;
 
-	public static void main(String[] args) throws InterruptedException, IOException, AWTException {
+	@BeforeTest
+	public void setUpTest() {
+		
 		System.setProperty("webdriver.chrome.driver", ".\\drivers\\chromedriver.exe");
 		driver = new ChromeDriver();
 		driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+	}
+	
+	@Test
+	public void verifyHeaderFooter() {
+		// Launch the application
+		driver.manage().window().maximize();
+		driver.get("http://automationpractice.com/index.php");
+				
+		// Verify whether the application launched 
+		String title = driver.getTitle();
+		System.out.println("Title: " + title);
+		
+		// Verify title is correct	
+		if (title.equalsIgnoreCase("My Store"))
+			System.out.println("Title matches");
+		else 
+			System.out.println("Title doesn't match");
+		
+		// Click on 'WOMEN'	header		
+		driver.findElement(By.xpath("//div[@id='block_top_menu']/ul/li/a")).click();
+		
+		// Capture 'WOMEN' page	header
+		WebElement women_page_header = driver.findElement(By.xpath("//header[@id='header']"));
+		Shutterbug.shootElement(driver, women_page_header).withName("Women_page_header").save();
+		
+		// Capture 'WOMEN' page	footer	
+		WebElement women_page_footer = driver.findElement(By.className("footer-container"));
+		Shutterbug.shootElement(driver, women_page_footer).withName("Women_page_footer").save();
+		
+		// Click on 'DRESSES' header		
+		driver.findElement(By.xpath("//div[@id='block_top_menu']/ul/li[2]/a")).click();
+		
+		// Capture 'DRESSES' page header
+		WebElement dresses_page_header = driver.findElement(By.xpath("//header[@id='header']"));
+		Shutterbug.shootElement(driver, dresses_page_header).withName("Dresses_page_header").save();
+		
+		// Capture 'DRESSES' page footer
+		WebElement dresses_page_footer = driver.findElement(By.className("footer-container"));
+		Shutterbug.shootElement(driver, dresses_page_footer).withName("Dresses_page_footer").save();
+		
+		
+	}
+	
+	@Test
+	public void newsletterSubscription() {
+		
+		// Launch the application
+		driver.manage().window().maximize();
+		driver.get("http://automationpractice.com/index.php");
+				
+		// Verify whether the application launched 
+		String title = driver.getTitle();
+		System.out.println("Title: " + title);
+		
+		// Verify title is correct	
+		if (title.equalsIgnoreCase("My Store"))
+			System.out.println("Title matches");
+		else 
+			System.out.println("Title doesn't match");
+		
+		driver.findElement(By.id("newsletter-input")).sendKeys("test"+new Random().nextInt(1000)+"@gmail.com");
+		driver.findElement(By.name("submitNewsletter")).click();
+		
+		// Verify successfully subscribed to this newsletter
+		String text = driver.findElement(By.xpath("//div[@id='columns']/p")).getText();
+		if (text.equalsIgnoreCase("Newsletter : You have successfully subscribed to this newsletter."))
+			System.out.println("Subscription to news letter - Successfull.");
+		else 
+			System.out.println("Subscription to news letter - Un-Successfull.");	
+		
+	}
+	
+	@Test
+	public void checkOut() throws InterruptedException, IOException {
 		
 		// Launch the application
 		driver.manage().window().maximize();
@@ -83,7 +165,7 @@ public class automationpractice {
 		
 		JavascriptExecutor jse = (JavascriptExecutor)driver;
 		jse.executeScript("window.scrollBy(0,-250)");
-		
+			
 		// 5. Navigate to 'Women' --> Summer dresses
 		WebElement we = driver.findElement(By.xpath("//div[@id='block_top_menu']/ul/li/a"));
 		Actions action = new Actions(driver);		
@@ -164,9 +246,15 @@ public class automationpractice {
 		
 		// 16. Sign out from the application
 		driver.findElement(By.linkText("Sign out")).click();
+		
+	}
+	
+	@AfterTest
+	public void tearDownTest() {
 					
 		// Close the web driver		
 		driver.close();
 		driver.quit();
+		
 	}
 }
